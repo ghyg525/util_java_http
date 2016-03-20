@@ -1,6 +1,10 @@
 package org.yangjie.httpclient;
 
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.http.Consts;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
@@ -8,13 +12,28 @@ import org.apache.http.entity.ContentType;
 public class HttpUtil {
 
     /**
+     * execute
+     * @param request
+     * @return
+     */
+    public static String execute(Request request) {
+    	try {
+			return new String(request.execute().returnContent().asBytes(), Consts.UTF_8);
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	return null;
+    }
+    
+    /**
      * get
      * @param url
      * @return
-     * @throws Exception
      */
-    public static String get(String url) throws Exception{
-    	return new String(Request.Get(url).execute().returnContent().asBytes(), Consts.UTF_8);
+    public static String get(String url) {
+    	return execute(Request.Get(url));
     }
     
     /**
@@ -22,54 +41,56 @@ public class HttpUtil {
      * @param url
      * @param form
      * @return
-     * @throws Exception
      */
-    public static String post(String url, Form form) throws Exception{
-    	return new String(Request.Post(url).bodyForm(form.build()).execute().returnContent().asBytes(), Consts.UTF_8);
+    public static String post(String url, Form form) {
+    	return execute(Request.Post(url).bodyForm(form.build()));
     }
     
     /**
      * post
      * @param url
-     * @param body 发送内容
+     * @param formMap
      * @return
-     * @throws Exception
      */
-    public static String post(String url, String body) throws Exception{
-    	return new String(Request.Post(url).bodyString(body, ContentType.TEXT_HTML).execute().returnContent().asBytes(), Consts.UTF_8);
+    public static String post(String url, Map<String, String> formMap) {
+    	Form form = Form.form();
+    	if (formMap!=null && !formMap.isEmpty()) {
+    		for(String key : formMap.keySet()){
+    			form.add(key, formMap.get(key));
+    		}
+			return post(url, form);
+		}
+    	return null;
     }
     
     /**
      * post
      * @param url
-     * @param body 发送内容
-     * @param contentType 请求内容类型
+     * @param body
+     * @param contentType
      * @return
-     * @throws Exception
      */
-    public static String post(String url, String body, ContentType contentType) throws Exception{
-    	return new String(Request.Post(url).bodyString(body, contentType).execute().returnContent().asBytes(), Consts.UTF_8);
+    public static String post(String url, String body, ContentType contentType) {
+    	return execute(Request.Post(url).bodyString(body, contentType));
     }
     
     /**
      * post (json)
      * @param url
-     * @param body 发送内容
+     * @param body
      * @return
-     * @throws Exception
      */
-    public static String postJson(String url, String body) throws Exception{
+    public static String postJson(String url, String body) {
     	return post(url, body, ContentType.APPLICATION_JSON);
     }
     
     /**
      * post (xml)
      * @param url
-     * @param body 发送内容
+     * @param body
      * @return
-     * @throws Exception 
      */
-    public static String postXml(String url, String body) throws Exception {
+    public static String postXml(String url, String body) {
 		return post(url, body, ContentType.create("application/xml", Consts.UTF_8));
     }
     
