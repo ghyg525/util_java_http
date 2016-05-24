@@ -9,6 +9,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
+/**
+ * HTTP工具类
+ * @author YangJie [2016年5月24日 下午6:15:41]
+ */
 public class HttpUtil {
 
 	private static final OkHttpClient client = new OkHttpClient();
